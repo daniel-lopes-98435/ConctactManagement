@@ -1,0 +1,21 @@
+name: CI/CD runnning in Github
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+    
+jobs:
+  build:
+    name: Initiating job
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4  # Ensures the repo is available in the runner
+
+      - name: Debug directory structure
+        run: ls -R  # Check the full structure
+
+      - name: Show current working directory
+        run: pwd
