@@ -1,21 +1,42 @@
-name: CI/CD runnning in Github
+name: Build and Test ContactManager API
+
 on:
   push:
-    branches: ["master"]
+    branches:
+      - main
   pull_request:
-    branches: ["master"]
-    
+    branches:
+      - main
+
 jobs:
-  build:
-    name: Initiating job
+  build-and-test:
     runs-on: ubuntu-latest
+
     steps:
+      # 1. Verifica o repositório do código
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Checkout repository
-        uses: actions/checkout@v4  # Ensures the repo is available in the runner
+      # 2. Configura o .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0
 
-      - name: Debug directory structure
-        run: ls -R  # Check the full structure
+      # 3. Restaura as dependências
+      - name: Restore dependencies
+        run: dotnet restore
 
-      - name: Show current working directory
-        run: pwd
+      # 4. Compila a solução
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Release
+
+      # 5. Executa os testes
+      - name: Run tests
+        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test_results.trx"
+        continue-on-error: false
+
+      # 6. Gera uma mensagem de sucesso
+      - name: Ready for deployment message
+        if: success()
+        run: echo "Tudo certo para o deploy!"
